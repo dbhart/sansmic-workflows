@@ -1,17 +1,12 @@
 name: Check semantic release
 on:
-  push:
+  workflow_call:
 
 jobs:
   pre-release:
     name: Perform a pre-release check
     runs-on: ubuntu-latest
 
-    permissions:
-      id-token: write
-      contents: write
-      pull-requests: write
-    
     steps:
     - name: Harden Runner
       uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
