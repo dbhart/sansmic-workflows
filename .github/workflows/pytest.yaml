@@ -3,9 +3,6 @@ name: Use pytest to run tests
 on:
   workflow_call:
     inputs:
-      packagename: 
-        required: true
-        type: string
       version:
         required: false
         default: '3.12'
@@ -18,10 +15,6 @@ on:
         default: false
         required: false
         type: boolean
-      extras:
-        default: ''
-        required: false
-        type: string
     secrets:
       coverage_token:
         required: false
@@ -31,7 +24,7 @@ permissions:
 
 jobs:
   run-pytest-coverage:
-    name: Test and compute coverage
+    name: pytest and coverarge
     runs-on: ${{ inputs.os }}
     steps: 
       - name: Harden Runner
@@ -58,29 +51,24 @@ jobs:
         with:
           python-version: ${{ inputs.version }}
 
-      - name: Install testing dependencies
+      - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
 
-      - name: Build with extras
-        if: inputs.extras != ''
-        run: python3 -m pip install -e .[${{ inputs.extras }}]
-
-      - name: Build without extras
-        if: inputs.extras == ''
-        run: python3 -m pip install -e .
+      - name: Build test
+        run: python3 -m pip install -e .[formats,examples,tests]
 
       - name: Test with pytest (quiet)
         if: ${{ ! inputs.verbose }}
         run: |
-          python3 -m pytest --nbmake --disable-warnings --cov=${{ inputs.packagename }} --cov=tests --no-header --color=auto examples/ tests/
+          python3 -m pytest --nbmake --disable-warnings --cov=sansmic --cov=tests --no-header --color=auto examples/ tests/
 
       - name: Test with pytest (non-windows, verbose)
         if: inputs.verbose && inputs.os != 'windows-latest'
         run: |
           echo '### Run tests' >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          python3 -m pytest --nbmake --disable-warnings --cov=${{ inputs.packagename }} --cov=tests --no-header --color=auto examples/ tests/ | tee -a $GITHUB_STEP_SUMMARY
+          python3 -m pytest --nbmake --disable-warnings --cov=sansmic --cov=tests --no-header --color=auto examples/ tests/ | tee -a $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Test with pytest (windows, verbose)
@@ -89,7 +77,7 @@ jobs:
         run: |
           echo '### Run tests' >> $Env:GITHUB_STEP_SUMMARY
           echo '```bash' >> $Env:GITHUB_STEP_SUMMARY
-          python3 -m pytest --nbmake --disable-warnings --cov=${{ inputs.packagename }} --cov=tests --no-header --color=auto examples/ tests/ >> $Env:GITHUB_STEP_SUMMARY
+          python3 -m pytest --nbmake --disable-warnings --cov=sansmic --cov=tests --no-header --color=auto examples/ tests/ >> $Env:GITHUB_STEP_SUMMARY
           echo '```' >> $Env:GITHUB_STEP_SUMMARY
 
       - name: Upload coverage reports to Codecov
@@ -102,4 +90,4 @@ jobs:
       - name: Test uninstall
         if: success() || failure()
         # Allow upload to codecov to fail but not fail all tests
-        run: python3 -m pip uninstall -y ${{ inputs.packagename }}
+        run: python3 -m pip uninstall -y sansmic
