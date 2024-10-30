@@ -36,16 +36,17 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         git_committer_name: "github-actions"
         git_committer_email: "actions@users.noreply.github.com"
+        root_options: --noop
         build: false
-        changelog: false
+        changelog: true
         commit: false
         push: false
         tag: false
         vcs_release: false
-        prerelease: true
-        build_metadata: ${{ github.ref_name }}@${{ steps.vars.outputs.short_sha }}
+        # prerelease: true
+        # build_metadata: ${{ github.ref_name }}@${{ steps.vars.outputs.short_sha }}
 
     - name: Action | Print results of release
-      run: 
-        echo "${{ steps.release.outputs.released == 'true' }}"
-        echo "${{ steps.release.outputs.version }}"
+      run: |
+        echo "Released: ${{ steps.release.outputs.released == 'true' }}\n"
+        echo "Version: ${{ steps.release.outputs.version }}\n"
