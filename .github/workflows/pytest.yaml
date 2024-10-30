@@ -64,11 +64,11 @@ jobs:
 
       - name: Build with extras
         if: inputs.extras != ''
-        run: python3 -m pip install .[${{ inputs.extras }}]
+        run: python3 -m pip install -e .[${{ inputs.extras }}]
 
       - name: Build without extras
         if: inputs.extras == ''
-        run: python3 -m pip install .
+        run: python3 -m pip install -e .
 
       - name: Test with pytest (quiet)
         if: ${{ ! inputs.verbose }}
